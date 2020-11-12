@@ -1,0 +1,282 @@
+nav {
+  color: white;
+  line-height: 2.5em;
+  padding: 10px 0;
+  overflow: auto;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+nav #banner {
+  display: inline-block;
+  margin-left: 50px;
+  font-size: 140%;
+  letter-spacing: 0.2em;
+  margin-top: 5px;
+}
+
+nav .split {
+  flex-grow: 1;
+}
+
+nav .split-right {
+  width: 230px;
+}
+
+nav ul.menu {
+  align-self: center;
+  margin-top: 0;
+  margin-bottom: 0;
+  padding-left: 20px;
+  display: inline-block;
+  vertical-align: +6px;
+  flex-grow: 1;
+}
+
+nav ul.menu li a {
+  color: inherit;
+  text-decoration: none;
+  padding: 8px;
+}
+
+nav ul.menu li a:visited {
+  color: inherit;
+}
+
+nav ul.menu li {
+  display: inline;
+  list-style-type: none;
+  white-space: nowrap;
+}
+
+nav ul.menu li.selected a {
+  border-bottom: 2px white solid;
+}
+
+nav ul.menu li a:hover {
+  border-bottom: 2px yellow solid;
+}
+
+html, body {
+  margin: 0;
+}
+
+div.content {
+  margin-left: 8px;
+  margin-right: 8px;
+}
+
+section {
+  margin: 10px;
+  border-color: silver;
+  border-width: 1px;
+  border-style: solid;
+  border-radius: 0.7em;
+  padding: 0.7em;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+section h1:first-child, section h2:first-child {
+  margin-top: 0.3em;
+}
+
+.cyan-bg {
+  background-color: #559999;
+  color: white;
+}
+
+.cyan-text {
+  color: #447777;
+}
+
+.blue-bg {
+  background-color: ;
+  color: white;
+}
+
+.black-bg {
+  background-color: black;
+  color: white;
+}
+
+table {
+  table-layout: fixed;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+thead {
+  font-weight: bold;
+  text-align: center;
+}
+
+table tr {
+  border-top: gray solid 1px;
+}
+
+table td {
+  padding: 10px 0;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+}
+
+td.date {
+  width:100px;
+}
+
+.no-underline {
+  text-decoration: none;
+}
+
+.text-center {
+  text-align: center;
+}
+
+input.wide, textarea.wide {
+  box-sizing:border-box;
+  width:100%;
+  padding: 3px 7px;
+}
+
+textarea {
+  height: 8em;
+}
+
+/*
+ * Most of these change-page CSS's come from Bootstrap pagination component
+ * (I just imitate Bootstrap)
+ */
+.change-page {
+  display: inline-block;
+  padding: 0;
+}
+
+.change-page > li {
+  display: inline;
+  float: left;
+}
+
+.change-page > li > a {
+  position: relative;
+  display: inline-block;
+  min-width: 30px;
+  padding: 6px 0;
+  margin-left: -1px;
+  text-decoration: none;
+  border-width: 1px;
+  border-style: solid;
+}
+
+.change-page > li:first-child > a {
+  border-top-left-radius: 4px;
+  border-bottom-left-radius: 4px;
+}
+
+.change-page > li:last-child > a {
+  border-top-right-radius: 4px;
+  border-bottom-right-radius: 4px;
+}
+
+/* colors */
+.change-page > li > a {
+  color: #447777;
+  background-color: white;
+  border-color: gray;
+}
+.change-page > .selected > a {
+  background-color: #559999;
+  color: white;
+}
+.change-page > li > a:hover {
+  background-color: #dddddd;
+}
+.change-page > .selected > a:hover {
+  background-color: #448888;
+}
+.change-page > li > a:focus {
+  background-color: #cccccc;
+}
+.change-page > .selected > a:focus {
+  background-color: #448888;
+}
+
+.button {
+  color: white;
+  text-decoration: none;
+  border: none;
+  border-radius: 4px;
+  padding: 5px 8px;
+  margin: 0px 3px;
+  background-color: gray;
+  font-size: 90%;
+  display: inline-block;
+}
+.button.blue {
+  background-color: #5588cc;
+}
+.button.blue:hover {
+  background-color: #6699dd;
+}
+.button.blue:focus {
+  background-color: #4477bb;
+}
+.button.blue:disabled{
+  background-color: gray;
+}
+.button.red {
+  background-color: #dd7777;
+}
+.button.red:hover, .button.red:focus {
+  background-color: #ee8888;
+}
+.button.red:active {
+  background-color: #cc6666;
+}
+.button.red:disabled{
+  background-color: gray;
+}
+.button.cyan {
+  background-color: #559999;
+}
+.button.cyan:hover, .button.cyan:focus {
+  background-color: #66aaaa;
+}
+.button.cyan:active {
+  background-color: #448888;
+}
+.button.cyan:disabled{
+  background-color: gray;
+}
+.button.green {
+  background-color: #77bb66;
+}
+.button.green:hover {
+  background-color: #88cc77;
+}
+.button.green:focus {
+  background-color: #66aa55;
+}
+.visualizer {
+  width: 100%;
+  height: 120px;
+  border: black 1px solid;
+}
+.progress-bg {
+  background: lightgray;
+}
+.progress-bar {
+  background: linear-gradient(45deg, lightgray 33%, #559999 33%, #559999 67%, lightgray 67%);
+  background-size: 20px 10px;
+  height: 10px;
+  animation-name: progress-bar;
+  animation-duration: 0.5s;
+  animation-iteration-count: infinite;
+  animation-timing-function: linear;
+}
+@keyframes progress-bar {
+  0%   {background-position:0px 0px;}
+  50%  {background-position:10px 0px;}
+  100% {background-position:20px 0px;}
+}

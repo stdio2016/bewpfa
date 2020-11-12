@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Identify music</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script src="libflac.min.wasm.js" charset="utf-8"></script>
+</head>
+<body>
+<nav class='navigation cyan-bg'>
+  <span id='banner'>pfa</span>
+</nav>
+<section>
+  <h1>Identify music</h1>
+  <div class="main-controls">
+    <canvas class="visualizer" height="120" width='600'></canvas>
+    <div>
+      <button id="btnRecord" class='button cyan'>Start recording</button>
+      <button id="btnStop" class='button red' disabled>Stop recording</button>
+    </div>
+  </div>
+  <div class="progress" style='margin-top:10px;'>
+    <div class='progress-bg'>
+      <div class='progress-bar' style='width:0%'></div>
+    </div>
+    <div id='progressMessage'></div>
+  </div>
+  <div class="query-results">
+
+  </div>
+  <script type="text/javascript" src="js/record.js"></script>
+</section>
+</body>
+</html>
