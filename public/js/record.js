@@ -166,9 +166,9 @@ function encodeWav() {
   function metadata_callback_fn() {
     
   }
-  Flac.init_encoder_stream(flac_encoder,
-    write_callback_fn,
-    metadata_callback_fn
+  Flac.init_encoder_ogg_stream(flac_encoder,
+    write_callback_fn,    //required callback(s)
+    metadata_callback_fn  //optional callback(s)
   );
   var buf_length = Math.min(buffer.length, bufferPos);
   var buffer_i32 = new Int32Array(buf_length);
