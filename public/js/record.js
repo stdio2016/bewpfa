@@ -219,7 +219,14 @@ function waitResult(id, startTime) {
         queryResult = JSON.parse(xhr.response);
         console.log(queryResult);
         if (queryResult.progress == 100) {
-          ended();
+          try {
+            showResult(queryResult);
+            ended();
+          }
+          catch (x) {
+            alert('client malfunction: ' + x);
+            console.error(x);
+          }
         }
         else if (queryResult.progress == 'error') {
           alert('Server error!');
@@ -252,6 +259,23 @@ function waitResult(id, startTime) {
 function ended() {
   showProgress('', '0%');
   btnRecord.disabled = false;
+}
+
+function showResult(json) {
+  var songs = json.songs;
+  var table = document.querySelector('.query-results table');
+  console.log(table);
+  while (table.rows.length > 1) {
+    table.rows[1].remove();
+  }
+  for (var i = 0; i < songs.length; i++) {
+    var row = table.insertRow(1);
+    var cell1 = row.insertCell(0);
+    var cell2 = row.insertCell(1);
+    cell1.textContent = songs[i].name;
+    cell2.textContent = songs[i].score;
+    cell2.style.textAlign = 'center';
+  }
 }
 
 Flac.on('ready', function(event){

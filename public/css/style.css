@@ -116,7 +116,7 @@ table tr {
   border-top: gray solid 1px;
 }
 
-table td {
+table td, th {
   padding: 10px 0;
   overflow-wrap: break-word;
   word-wrap: break-word;
