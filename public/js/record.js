@@ -229,20 +229,22 @@ function waitResult(id, startTime) {
           }
         }
         else if (queryResult.progress == 'error') {
-          alert('Server error!');
+          alert('Server error! Reason: ' + queryResult.reason);
           ended();
-        }
-        else if (new Date() - startTime > 10000) {
-          alert('Server timeout');
-          ended();
-        }
-        else {
-          setTimeout(waitResult.bind(this, id, startTime), 100);
         }
       }
       catch (x) {
         alert('Server malfunction: ' + x);
         ended();
+      }
+    }
+    else if (xhr.status == 404) {
+      if (new Date() - startTime > 10000) {
+        alert('Server timeout');
+        ended();
+      }
+      else {
+        setTimeout(waitResult.bind(this, id, startTime), 100);
       }
     }
     else {

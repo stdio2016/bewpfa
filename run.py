@@ -3,6 +3,16 @@ import time
 import threading
 import os
 import subprocess
+import socket
+import json
+
+def create_dir(name):
+    if not os.path.exists(name):
+        os.makedirs(name)
+create_dir('wavs')
+create_dir('queryResult')
+create_dir('query')
+create_dir('tmp')
 
 app = Flask(__name__, static_url_path='')
 UPLOAD_FOLDER = 'query'
@@ -17,15 +27,41 @@ class QueryThread(threading.Thread):
         self.thread_id = thread_id
     def run(self):
         try:
+            wav_file = os.path.join('wavs', self.task_id + '.wav')
+            result_file = os.path.join('queryResult', self.task_id + '.out')
+            ffmpeg_log = 'ffmpeg_t'+str(self.thread_id)+'.log'
+            tmp_out = os.path.join('tmp', 'tmp_t'+str(self.thread_id)+'.out')
             subprocess.run(['ffmpeg',
                 '-i', os.path.join(app.config['UPLOAD_FOLDER'], self.task_id + '.flac'),
-                '-y', os.path.join('wavs', self.task_id + '.wav')
-            ], stderr=open('q'+str(self.thread_id)+'.log', 'a'))
-            with open(os.path.join('queryResult', self.task_id + '.out'), 'w') as fout:
-                fout.write('{"progress":100,"songs":[{"name":"00001.mp3","score":100}]}')
+                '-y', wav_file
+            ], stderr=open(ffmpeg_log, 'a'))
+            sock = socket.socket()
+            sock.connect(('127.0.0.1', 1605))
+            sock.send(('query ' + wav_file + '\n').encode('utf-8'))
+            nread = 0
+            with open(tmp_out, 'wb') as fout:
+                while True:
+                    buf = sock.recv(1024)
+                    nread += len(buf)
+                    fout.write(buf)
+                    if len(buf) == -1:
+                        crash = True
+                    if len(buf) < 1024:
+                        break
+                if nread == 0:
+                    fout.write(json.dumps({'progress':'error','reason':'server crashed'}))
+            os.rename(tmp_out, result_file)
+        except ConnectionRefusedError as x:
+            with open(result_file, 'w') as fout:
+                fout.write(json.dumps({'progress':'error','reason':'server unavailable'}))
+            raise
+        except ConnectionResetError as x:
+            with open(result_file, 'w') as fout:
+                fout.write(json.dumps({'progress':'error','reason':'server crashed'}))
+            raise
         except Exception as x:
-            with open(os.path.join('queryResult', self.task_id + '.out'), 'w') as fout:
-                fout.write('{"progress":"error"}')
+            with open(result_file, 'w') as fout:
+                fout.write(json.dumps({'progress':'error','reason':'unknown'}))
             raise
         finally:
             threadrunning[self.thread_id] = False
@@ -64,8 +100,6 @@ def query():
     if tid is not None:
         queryCount += 1
         file.save(os.path.join(app.config['UPLOAD_FOLDER'], genname + '.flac'))
-        with open(os.path.join('queryResult', genname + '.out'), 'w') as fout:
-            fout.write('{"progress":0}')
         async_task = QueryThread(genname, tid)
         threadrunning[tid] = True
         async_task.start()
