@@ -276,7 +276,10 @@ function showResult(json) {
     cell1.textContent = songs[i].name;
     cell2.textContent = songs[i].score;
     cell2.style.textAlign = 'center';
-    var audio = new Audio('/finddup/audio/' + songs[i].name);
+    var audio = new Audio();
+    audio.preload = 'none';
+    audio.src = '/finddup/audio/' + songs[i].name;
+    audio.currentTime = songs[i].time;
     audio.controls = true;
     cell3.append(audio);
   }
