@@ -281,7 +281,8 @@ function showResult(json) {
     var audio = new Audio();
     audio.preload = 'none';
     audio.src = '/finddup/audio/' + songs[i].name;
-    audio.currentTime = songs[i].time;
+    if (songs[i].time)
+      audio.currentTime = songs[i].time;
     audio.controls = true;
     cell3.append(audio);
   }
