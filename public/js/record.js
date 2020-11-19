@@ -190,7 +190,12 @@ function uploadWav(blob) {
   xhr.open('POST', 'query');
   var formData = new FormData();
   formData.append('file', blob);
-  xhr.send(formData);
+  if(xhr.upload) {
+    xhr.upload.onprogress = function (evt) {
+      var percentComplete = Math.ceil((evt.loaded / evt.total) * 50);
+      showProgress('Uploading', (50+percentComplete) + '%');
+    };
+  }
   xhr.onload = function () {
     if (xhr.status == 200) {
       console.log(xhr.response);
@@ -207,6 +212,7 @@ function uploadWav(blob) {
     alert('upload failed');
     ended();
   };
+  xhr.send(formData);
 }
 
 function waitResult(id, startTime) {
@@ -296,5 +302,6 @@ Flac.on('ready', function(event){
 });
 
 function uploadFile() {
+  showProgress('Uploading', '50%');
   uploadWav(inFile.files[0]);
 }
