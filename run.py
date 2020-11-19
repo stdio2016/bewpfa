@@ -86,6 +86,10 @@ def libflac_wasm():
 def css_files(filename):
     return send_from_directory('public/css', filename)
 
+@app.route('/audio/<path:filename>')
+def audio_files(filename):
+    return send_from_directory('public/audio', filename)
+
 @app.route('/query', methods=['POST'])
 def query():
     global queryCount

@@ -280,7 +280,10 @@ function showResult(json) {
     cell2.style.textAlign = 'center';
     var audio = new Audio();
     audio.preload = 'none';
-    audio.src = '/finddup/audio/' + songs[i].name;
+    if (songs[i].file)
+      audio.src = songs[i].file;
+    else
+      audio.src = '/finddup/audio/' + songs[i].name;
     if (songs[i].time)
       audio.currentTime = songs[i].time;
     audio.controls = true;
@@ -291,3 +294,7 @@ function showResult(json) {
 Flac.on('ready', function(event){
   startup();
 });
+
+function uploadFile() {
+  uploadWav(inFile.files[0]);
+}

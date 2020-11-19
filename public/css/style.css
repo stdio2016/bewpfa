@@ -216,10 +216,10 @@ textarea {
 .button.blue {
   background-color: #5588cc;
 }
-.button.blue:hover {
+.button.blue:hover, .button.blue:focus {
   background-color: #6699dd;
 }
-.button.blue:focus {
+.button.blue:active {
   background-color: #4477bb;
 }
 .button.blue:disabled{
@@ -252,10 +252,10 @@ textarea {
 .button.green {
   background-color: #77bb66;
 }
-.button.green:hover {
+.button.green:hover, .button.green:focus {
   background-color: #88cc77;
 }
-.button.green:focus {
+.button.green:active {
   background-color: #66aa55;
 }
 .visualizer {
