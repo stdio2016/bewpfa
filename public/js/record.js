@@ -128,6 +128,11 @@ function stopRecord() {
     cancelAnimationFrame(rafId);
     btnStop.disabled = true;
     recording = false;
+    if (bufferPos < audioCtx.sampleRate*2) {
+      alert('Query is too short! Please record at least 5 seconds');
+      ended();
+      return;
+    }
     showProgress('Encoding', '25%');
     setTimeout(function () {
       try {
@@ -302,6 +307,18 @@ Flac.on('ready', function(event){
 });
 
 function uploadFile() {
-  showProgress('Uploading', '50%');
-  uploadWav(inFile.files[0]);
+  if (inFile.files.length > 0) {
+    showProgress('Uploading', '50%');
+    uploadWav(inFile.files[0]);
+  }
+  else alert('Please choose a file!');
+}
+
+function setQueryTime() {
+  var result = prompt('Enter query length in seconds: (5~20)', querySecs);
+  var secs = parseInt(result);
+  if (secs >= 5 && secs <= 20) querySecs = secs;
+  else if (result != '' && result != null) {
+    alert("Input must be between 5 and 20");
+  }
 }
