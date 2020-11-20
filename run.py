@@ -66,6 +66,10 @@ class QueryThread(threading.Thread):
         finally:
             threadrunning[self.thread_id] = False
 
+@app.route('/<filename>')
+def all_files(filename):
+    return send_from_directory('public', filename)
+
 @app.route('/')
 def index_page():
     return send_file('public/index.html')
@@ -73,14 +77,6 @@ def index_page():
 @app.route('/js/<path:filename>')
 def js_files(filename):
     return send_from_directory('public/js', filename)
-
-@app.route('/libflac.min.wasm.js')
-def libflac():
-    return send_file('public/libflac.min.wasm.js')
-
-@app.route('/libflac.min.wasm.wasm')
-def libflac_wasm():
-    return send_file('public/libflac.min.wasm.wasm')
 
 @app.route('/css/<path:filename>')
 def css_files(filename):
