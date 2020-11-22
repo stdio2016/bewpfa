@@ -246,6 +246,7 @@ function waitResult(id, startTime) {
       }
       catch (x) {
         alert('Server malfunction: ' + x);
+        console.log(xhr.response);
         ended();
       }
     }
