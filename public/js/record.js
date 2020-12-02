@@ -162,7 +162,8 @@ function encodeWav() {
   var compression = 5;
   var verify = false;
   var blockSize = 0;
-  var flac_encoder = Flac.create_libflac_encoder(sampleRate, channels, bps, compression, 0, verify, blockSize);
+  var buf_length = Math.min(buffer.length, bufferPos);
+  var flac_encoder = Flac.create_libflac_encoder(sampleRate, channels, bps, compression, buf_length, verify, blockSize);
   var result = [];
 
   function write_callback_fn(encodedData, bytes, samples, current_frame) {
@@ -175,7 +176,6 @@ function encodeWav() {
     write_callback_fn,    //required callback(s)
     metadata_callback_fn  //optional callback(s)
   );
-  var buf_length = Math.min(buffer.length, bufferPos);
   var buffer_i32 = new Int32Array(buf_length);
   var view = new DataView(buffer_i32.buffer);
   for (var i = 0; i < buf_length; i++) {
@@ -184,7 +184,7 @@ function encodeWav() {
   Flac.FLAC__stream_encoder_process_interleaved(flac_encoder, buffer_i32, buf_length);
   Flac.FLAC__stream_encoder_finish(flac_encoder);
   Flac.FLAC__stream_encoder_delete(flac_encoder);
-  wavFile = new Blob(result);
+  wavFile = new File(result, 'blob.flac', {type:'audio/flac'});
   console.log(wavFile.size);
   showProgress('Uploading', '50%');
   uploadWav(wavFile);
