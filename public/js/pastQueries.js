@@ -11,6 +11,7 @@ function toplay() {
 
 function showResult(json) {
   var songs = json.songs;
+  if (!(songs instanceof Array)) return;
   var table = document.querySelector('.query-results table tbody');
   console.log(table);
   while (table.rows.length > 0) {
@@ -35,4 +36,36 @@ function showResult(json) {
     audio.controls = true;
     cell3.append(audio);
   }
+}
+
+function parseQuery() {
+  var search = location.search;
+  var args = {};
+  search = search.substring(1).split('&');
+  for (var i = 0; i < search.length; i++) {
+    var find = search[i].indexOf('=');
+    var name = search[i], dat = '';
+    if (find != -1) {
+      var name = search[i].substring(0, find);
+      var dat = search[i].substring(find+1);
+    }
+    args[name] = dat;
+  }
+  console.log(args);
+  return args;
+}
+
+function loadDetails() {
+  var args = parseQuery();
+  if (!args.name) return;
+  
+  audioElt.src = 'wavs/' + args.name + '.wav';
+  
+  var xhr = new XMLHttpRequest();
+  xhr.onload = function () {
+    var json = JSON.parse(xhr.responseText);
+    showResult(json);
+  }
+  xhr.open('GET', 'queryResult/' + args.name);
+  xhr.send();
 }
