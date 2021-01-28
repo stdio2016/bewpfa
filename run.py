@@ -83,8 +83,11 @@ class QueryThread(threading.Thread):
                 write_status(result_file, json.dumps({'progress':'error','reason':'server crashed'}))
             else:
                 dat = json.loads(result.decode('utf8'))
-                top1 = dat['songs'][0]
-                d = {'name': self.task_id, 'result': top1['name']}
+                if 'songs' in dat and len(dat['songs']) > 0:
+                    top1 = dat['songs'][0]
+                    d = {'name': self.task_id, 'result': top1['name']}
+                else:
+                    d = {'name': self.task_id, 'result': 'error'}
                 with past_query_lock:
                     query_results.append(d)
                 write_status(result_file, result)
