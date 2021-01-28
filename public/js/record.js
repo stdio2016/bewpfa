@@ -190,11 +190,12 @@ function encodeWav() {
   uploadWav(wavFile);
 }
 
-function uploadWav(blob) {
+function uploadWav(blob, queryType) {
   var xhr = new XMLHttpRequest();
   xhr.open('POST', 'query');
   var formData = new FormData();
   formData.append('file', blob);
+  if (queryType) formData.append('querytype', queryType);
   if(xhr.upload) {
     xhr.upload.onprogress = function (evt) {
       var percentComplete = Math.ceil((evt.loaded / evt.total) * 50);
@@ -242,6 +243,9 @@ function waitResult(id, startTime) {
         else if (queryResult.progress == 'error') {
           alert('Server error! Reason: ' + queryResult.reason);
           ended();
+        }
+        else {
+          setTimeout(waitResult.bind(this, id, startTime), 100);
         }
       }
       catch (x) {
@@ -310,7 +314,7 @@ Flac.on('ready', function(event){
 function uploadFile() {
   if (inFile.files.length > 0) {
     showProgress('Uploading', '50%');
-    uploadWav(inFile.files[0]);
+    uploadWav(inFile.files[0], 'upload');
   }
   else alert('Please choose a file!');
 }

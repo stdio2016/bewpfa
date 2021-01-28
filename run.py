@@ -20,48 +20,57 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 queryCount = 0
 threadrunning = [False] * 2
 
+result_lock = threading.Lock()
+query_names = os.listdir('queryResult')
+
+def write_status(path, data):
+    if type(data) == str:
+        is_bin = 'w'
+    else:
+        is_bin = 'wb'
+    with result_lock, open(path, is_bin) as fout:
+        fout.write(data)
+
 class QueryThread(threading.Thread):
-    def __init__(self, task_id, thread_id):
+    def __init__(self, task_id, thread_id, query_type):
         super(QueryThread, self).__init__()
         self.task_id = task_id
         self.thread_id = thread_id
+        self.query_type = query_type
     def run(self):
         try:
             wav_file = os.path.join('wavs', self.task_id + '.wav')
             result_file = os.path.join('queryResult', self.task_id + '.out')
+            ext = '.flac' if self.query_type == 'recording' else ''
             ffmpeg_log = 'ffmpeg_t'+str(self.thread_id)+'.log'
-            tmp_out = os.path.join('tmp', 'tmp_t'+str(self.thread_id)+'.out')
             subprocess.run(['ffmpeg',
-                '-i', os.path.join(app.config['UPLOAD_FOLDER'], self.task_id + '.flac'),
+                '-i', os.path.join(app.config['UPLOAD_FOLDER'], self.task_id + ext),
                 '-y', wav_file
             ], stderr=open(ffmpeg_log, 'a'))
+            write_status(result_file, json.dumps({'progress':50}))
             sock = socket.socket()
             sock.connect(('127.0.0.1', 1605))
             sock.send(('query ' + wav_file + '\n').encode('utf-8'))
             nread = 0
-            with open(tmp_out, 'wb') as fout:
-                while True:
-                    buf = sock.recv(1024)
-                    nread += len(buf)
-                    fout.write(buf)
-                    if len(buf) == -1:
-                        crash = True
-                    if len(buf) < 1024:
-                        break
-                if nread == 0:
-                    fout.write(json.dumps({'progress':'error','reason':'server crashed'}))
-            os.rename(tmp_out, result_file)
+            result = []
+            while True:
+                buf = sock.recv(1024)
+                nread += len(buf)
+                result.append(buf)
+                if len(buf) < 1024:
+                    break
+            if nread == 0:
+                write_status(result_file, json.dumps({'progress':'error','reason':'server crashed'}))
+            else:
+                write_status(result_file, b''.join(result))
         except ConnectionRefusedError as x:
-            with open(result_file, 'w') as fout:
-                fout.write(json.dumps({'progress':'error','reason':'server unavailable'}))
+            write_status(result_file, json.dumps({'progress':'error','reason':'server unavailable'}))
             raise
         except ConnectionResetError as x:
-            with open(result_file, 'w') as fout:
-                fout.write(json.dumps({'progress':'error','reason':'server crashed'}))
+            write_status(result_file, json.dumps({'progress':'error','reason':'server crashed'}))
             raise
         except Exception as x:
-            with open(result_file, 'w') as fout:
-                fout.write(json.dumps({'progress':'error','reason':'unknown'}))
+            write_status(result_file, json.dumps({'progress':'error','reason':'unknown'}))
             raise
         finally:
             threadrunning[self.thread_id] = False
@@ -92,26 +101,36 @@ def query():
     if 'file' not in request.files:
         return 'No file part', 400
     file = request.files['file']
+    querytype = request.form.get('querytype', 'recording')
     genname = time.strftime('%Y-%m-%dT%H-%M-%S') + '_' + str(queryCount)
+    if querytype == 'recording':
+        ext = '.flac'
+    elif querytype == 'upload':
+        ext = ''
+    else:
+        return 'Unknown query type', 400
     tid = None
     for i in range(len(threadrunning)):
         if not threadrunning[i]:
             tid = i
     if tid is not None:
         queryCount += 1
-        file.save(os.path.join(app.config['UPLOAD_FOLDER'], genname + '.flac'))
-        async_task = QueryThread(genname, tid)
+        file.save(os.path.join(app.config['UPLOAD_FOLDER'], genname + ext))
+        async_task = QueryThread(genname, tid, querytype)
         threadrunning[tid] = True
         async_task.start()
+        result_file = os.path.join('queryResult', genname + '.out')
+        write_status(result_file, json.dumps({'progress':0}))
         return genname
     else:
         return 'too many requests', 429
 
 @app.route('/queryResult/<path>')
 def queryResult(path):
-    response = send_from_directory('queryResult', path + '.out')
-    response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
-    return response
+    with result_lock:
+        response = send_from_directory('queryResult', path + '.out')
+        response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+        return response
 
 if __name__ == "__main__":
     app.run(port=5025, debug=False)
