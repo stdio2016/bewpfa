@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Past queries</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<nav class='navigation cyan-bg'>
+  <span id='banner'>pfa</span>
+  <span class='split'></span>
+  <ul class='menu'>
+    <li><a href='index.html'>Main</a></li>
+    <li><a href='javascript:alert("TODO")'>Song List</a></li>
+    <li><a href='pastQueries'>Past Queries</a></li>
+  </ul>
+  <span class='split-right'></span>
+</nav>
+<section>
+  <h1>Past queries</h1>
+  <div class="query-results">
+    <table style='table-layout: auto;'>
+      <thead>
+        <tr class='cyan-bg'>
+          <th>Date</th>
+          <th>Result</th>
+        </tr>
+      </thead>
+      <tbody>
+      {% for result in query_results %}
+        <tr>
+          <td>{{ result.name }}</td>
+          <td>{{ result.result }}</td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <script type="text/javascript" src="js/pastQueries.js"></script>
+</section>
+</body>
+</html>

@@ -1,4 +1,4 @@
-from flask import Flask, request, redirect, url_for, send_file, send_from_directory
+from flask import Flask, request, redirect, url_for, send_file, send_from_directory, render_template
 import time
 import threading
 import os
@@ -21,7 +21,26 @@ queryCount = 0
 threadrunning = [False] * 2
 
 result_lock = threading.Lock()
+past_query_lock = threading.Lock()
 query_names = os.listdir('queryResult')
+query_names.sort()
+query_results = []
+for name in query_names:
+    if name.endswith('.out'):
+        with open(os.path.join('queryResult', name), 'r', encoding='utf8') as fin:
+            name = name[:-4]
+            d = {'name': name}
+            try:
+                dat = json.load(fin)
+                if dat['progress'] == 100:
+                    top1 = dat['songs'][0]
+                    d = {**d, 'result': top1['name']}
+                else:
+                    d = {**d, 'result': 'error'}
+            except Exception as x:
+                print('error %s! %s' % (x, name))
+                d = {**d, 'result': 'parse error!'}
+            query_results.append(d)
 
 def write_status(path, data):
     if type(data) == str:
@@ -62,6 +81,11 @@ class QueryThread(threading.Thread):
             if nread == 0:
                 write_status(result_file, json.dumps({'progress':'error','reason':'server crashed'}))
             else:
+                dat = json.loads(buf)
+                top1 = dat['songs'][0]
+                d = {'name': self.task_id, 'result': top1['name']}
+                with past_query_lock:
+                    query_results.append(d)
                 write_status(result_file, b''.join(result))
         except ConnectionRefusedError as x:
             write_status(result_file, json.dumps({'progress':'error','reason':'server unavailable'}))
@@ -131,6 +155,16 @@ def queryResult(path):
         response = send_from_directory('queryResult', path + '.out')
         response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
         return response
+
+@app.route('/wavs/<path>')
+def wav_files(path):
+    response = send_from_directory('wavs', path)
+    return response
+
+@app.route('/pastQueries')
+def past_queries():
+    with past_query_lock:
+        return render_template('pastQueries.html', query_results=query_results)
 
 if __name__ == "__main__":
     app.run(port=5025, debug=False)
