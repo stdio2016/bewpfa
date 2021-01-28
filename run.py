@@ -78,15 +78,16 @@ class QueryThread(threading.Thread):
                 result.append(buf)
                 if len(buf) < 1024:
                     break
+            result = b''.join(result)
             if nread == 0:
                 write_status(result_file, json.dumps({'progress':'error','reason':'server crashed'}))
             else:
-                dat = json.loads(buf)
+                dat = json.loads(result)
                 top1 = dat['songs'][0]
                 d = {'name': self.task_id, 'result': top1['name']}
                 with past_query_lock:
                     query_results.append(d)
-                write_status(result_file, b''.join(result))
+                write_status(result_file, result)
         except ConnectionRefusedError as x:
             write_status(result_file, json.dumps({'progress':'error','reason':'server unavailable'}))
             raise
