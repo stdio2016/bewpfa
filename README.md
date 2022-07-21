@@ -1,1 +1,1 @@
-This project is obsolete. Please see <https://github.com/stdio2016/bewpfa> instead.
+This project is obsolete. Please see <https://github.com/stdio2016/afpweb> instead.
