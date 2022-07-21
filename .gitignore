@@ -3,3 +3,4 @@ queryResult
 wavs
 *.log
 audio/
+.DS_Store
